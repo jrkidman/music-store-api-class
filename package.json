@@ -1,0 +1,31 @@
+{
+  "name": "music-store-api-class",
+  "version": "1.0.0",
+  "description": "api for music store",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon src/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jrkidman/music-store-api-class.git"
+  },
+  "author": "j kidman",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jrkidman/music-store-api-class/issues"
+  },
+  "homepage": "https://github.com/jrkidman/music-store-api-class#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "body-parser": "^1.20.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.1",
+    "mongoose": "^6.6.5"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}
