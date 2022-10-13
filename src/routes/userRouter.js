@@ -1,6 +1,7 @@
 const express = require('express');
 const UserModel = require('../models/UserModel');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const cleanUser = (userDocument) => {
     return {
@@ -67,8 +68,11 @@ userRouter.post('/sign-in', async (req, res, next) => {
 
         // if the user exists and the password matches, the user can be successfully authenticated
         // send user data back to the client
+        const token = jwt.sign({userId: foundUser._id, iat: Date.now()}, process.env.AUTH_SECRET_KEY)
+        
         res.send({ user: cleanUser(foundUser) });
-    } catch (error) {
+    }
+    catch (error) {
         next(error);
     }
 
