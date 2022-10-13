@@ -25,6 +25,11 @@ app.use(bodyParser.json());
 //userRoutes
 app.use(userRouter);
 
+const errorHandler = (error, req, res, next) =>{
+    console.log('error: ', error);
+    res.status(500).send('big big error');
+};
 
+app.use(errorHandler);
 
 app.listen(3010, () => console.log('music store server is listening for requests'));

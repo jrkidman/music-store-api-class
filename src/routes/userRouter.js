@@ -2,6 +2,18 @@ const express = require('express');
 const UserModel = require('../models/UserModel');
 const bcrypt = require('bcrypt');
 
+const cleanUser = (userDocument) => {
+    return {
+        id: userDocument._id,
+        firstName: userDocument.firstName,
+        lastName: userDocument.lastName,
+        email: userDocument.email,
+        profilePicture: userDocument.profilePicture,
+        isAdmin: userDocument.isAdmin,
+    }
+}
+
+
 const userRouter = express.Router();
 
 //finish user registration:
@@ -14,25 +26,55 @@ userRouter.post('/register-user', async (req, res, next) => {
 
     const { firstName, lastName, email, password, profilePicture, isAdmin } = req.body;
 
-    //hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
-    // console.log('hashedPassword: ', hashedPassword);
 
-    const userDocument = new UserModel({
-        firstName, lastName, email, hashedPassword, profilePicture, isAdmin
-    })
+    try {
+        const userDocument = new UserModel({
+            firstName, lastName, email, hashedPassword, profilePicture
+        })
+        await userDocument.save();
 
-    userDocument.save();
-
-    res.send({
-        user: {
-            id: userDocument._id,
-            firstName, lastName, email, profilePicture,
-            isAdmin: userDocument.isAdmin
-        }
-    })
+        //send user info to frontend
+        res.send({ user: cleanUser(userDocument) });
+    }
+    catch (error) {
+        next(error);
+    }
 
 });
+
+
+
+
+userRouter.post('/sign-in', async (req, res, next) => {
+    // get the credentials (data) from the request
+    const { email, password } = req.body.credentials;
+
+    try {
+        // check if the user exists in the db
+        const foundUser = await UserModel.findOne({ email: email });
+        console.log("foundUser ", foundUser);
+
+        // if the user exists, verify the password
+        if (!foundUser) {
+            return res.status(401).send('user not found, or incorrect credentials');
+        }
+
+        const passwordMatch = await bcrypt.compare(password, foundUser.hashedPassword);
+        if (!passwordMatch) {
+            return res.status(401).send('user not found, or incorrect credentials');
+        }
+
+        // if the user exists and the password matches, the user can be successfully authenticated
+        // send user data back to the client
+        res.send({ user: cleanUser(foundUser) });
+    } catch (error) {
+        next(error);
+    }
+
+    // provide a way for the user to not have to enter their info again in future requests
+
+})
 
 module.exports = userRouter;
 
